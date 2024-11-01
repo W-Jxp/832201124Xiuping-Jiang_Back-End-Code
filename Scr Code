@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>通讯录</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* 样式保持不变 */
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #222;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+        }
+        .contact-form, .contact-list {
+            width: 90%;
+            max-width: 400px;
+            background-color: #333;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            margin-bottom: 20px;
+            box-sizing: border-box;
+        }
+        .contact-form h2, .contact-list h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #ddd;
+            text-align: center;
+        }
+        .form-group {
+            margin: 10px 0;
+            position: relative;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px 12px 40px;
+            border: none;
+            border-radius: 5px;
+            background-color: #444;
+            color: #ddd;
+            font-size: 16px;
+            outline: none;
+            box-sizing: border-box;
+        }
+        .form-group .icon {
+            position: absolute;
+            top: 50%;
+            left: 10px;
+            transform: translateY(-50%);
+            font-size: 18px;
+            color: #888;
+        }
+        .button {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background-color: #555;
+            border: none;
+            border-radius: 5px;
+            color: #ddd;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+            text-align: center;
+            box-sizing: border-box;
+            max-width: 400px;
+            margin: 10px auto;
+        }
+        .button:hover {
+            background-color: #666;
+        }
+        .contact-item {
+            padding: 10px;
+            border-bottom: 1px solid #444;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .contact-item:last-child {
+            border-bottom: none;
+        }
+        .edit-button, .delete-button {
+            background-color: #4CAF50;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+            color: #fff;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 5px;
+        }
+        .delete-button {
+            background-color: #ff4c4c;
+        }
+    </style>
+</head>
+<body>
+
+<button class="button" onclick="toggleContactForm()">新建联系人</button>
+<button class="button" onclick="toggleContactList()">查看已有联系人</button>
+
+<div class="contact-form" style="display: none;">
+    <h2>添加联系人</h2>
+    <div class="form-group">
+        <i class="fas fa-user icon"></i>
+        <input type="text" id="name" placeholder="姓名">
+    </div>
+    <div class="form-group">
+        <i class="fas fa-user icon"></i>
+        <input type="text" id="pinyin" placeholder="姓名拼音">
+    </div>
+    <div class="form-group">
+        <i class="fas fa-phone icon"></i>
+        <input type="text" id="phone" placeholder="号码">
+    </div>
+    <div class="form-group">
+        <i class="fas fa-envelope icon"></i>
+        <input type="text" id="email" placeholder="邮箱">
+    </div>
+    <div class="form-group">
+        <i class="fas fa-users icon"></i>
+        <input type="text" id="group" placeholder="群组">
+    </div>
+    <div class="form-group">
+        <i class="fas fa-building icon"></i>
+        <input type="text" id="company" placeholder="公司">
+    </div>
+    <div class="form-group">
+        <i class="fas fa-briefcase icon"></i>
+        <input type="text" id="position" placeholder="职位">
+    </div>
+    <button class="button" onclick="addContact()">保存至本机</button>
+</div>
+
+<div class="contact-list" style="display: none;">
+    <h2>联系人列表</h2>
+    <div id="contactList"></div>
+    <button class="button" onclick="toggleContactForm()">返回添加联系人</button>
+</div>
+
+<script>
+    const contacts = [];
+
+    function addContact() {
+        const name = document.getElementById("name").value;
+        const pinyin = document.getElementById("pinyin").value;
+        const phone = document.getElementById("phone").value;
+        const email = document.getElementById("email").value;
+        const group = document.getElementById("group").value;
+        const company = document.getElementById("company").value;
+        const position = document.getElementById("position").value;
+
+        const contact = { name, pinyin, phone, email, group, company, position };
+        contacts.push(contact);
+
+        alert("联系人已添加！");
+        clearForm();
+    }
+
+    function clearForm() {
+        document.getElementById("name").value = "";
+        document.getElementById("pinyin").value = "";
+        document.getElementById("phone").value = "";
+        document.getElementById("email").value = "";
+        document.getElementById("group").value = "";
+        document.getElementById("company").value = "";
+        document.getElementById("position").value = "";
+    }
+
+    function toggleContactForm() {
+        const contactForm = document.querySelector(".contact-form");
+        const contactList = document.querySelector(".contact-list");
+        contactForm.style.display = contactForm.style.display === "none" ? "block" : "none";
+        contactList.style.display = "none"; 
+    }
+
+    function toggleContactList() {
+        const contactForm = document.querySelector(".contact-form");
+        const contactList = document.querySelector(".contact-list");
+        contactList.style.display = contactList.style.display === "none" ? "block" : "none";
+        contactForm.style.display = "none"; 
+        if (contactList.style.display === "block") displayContacts();
+    }
+
+    function displayContacts() {
+        const contactListDiv = document.getElementById("contactList");
+        contactListDiv.innerHTML = "";
+        contacts.forEach((contact, index) => {
+            const contactItem = document.createElement("div");
+            contactItem.classList.add("contact-item");
+            contactItem.innerHTML = `
+                <div>
+                    <strong>${contact.name}</strong> - ${contact.phone} <br>
+                    ${contact.email} - ${contact.group} <br>
+                    ${contact.company} - ${contact.position}
+                </div>
+                <div>
+                    <button class="edit-button" onclick="editContact(${index})">编辑</button>
+                    <button class="delete-button" onclick="deleteContact(${index})">删除</button>
+                </div>
+            `;
+            contactListDiv.appendChild(contactItem);
+        });
+    }
+
+    function deleteContact(index) {
+        contacts.splice(index, 1);
+        displayContacts();
+    }
+
+    function editContact(index) {
+        const contact = contacts[index];
+        document.getElementById("name").value = contact.name;
+        document.getElementById("pinyin").value = contact.pinyin;
+        document.getElementById("phone").value = contact.phone;
+        document.getElementById("email").value = contact.email;
+        document.getElementById("group").value = contact.group;
+        document.getElementById("company").value = contact.company;
+        document.getElementById("position").value = contact.position;
+        
+        deleteContact(index);
+        toggleContactForm();
+    }
+</script>
+
+</body>
+</html>
